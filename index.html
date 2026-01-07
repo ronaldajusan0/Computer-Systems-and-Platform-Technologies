@@ -1,0 +1,1589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Data Formats Overview</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #ffffff;
+      --card: #f7f9fc;
+      --accent: #667eea;
+      --accent-2: #764ba2;
+      --text: #2d3748;
+      --muted: #718096;
+      --border: #e2e8f0;
+      --shadow: 0 10px 40px rgba(0,0,0,0.1);
+      --radius: 20px;
+      --font: "Manrope", "Segoe UI", sans-serif;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-20px); }
+    }
+    @keyframes glow {
+      0%, 100% { box-shadow: 0 0 20px rgba(102,126,234,0.3), 0 0 40px rgba(118,75,162,0.2); }
+      50% { box-shadow: 0 0 40px rgba(102,126,234,0.6), 0 0 60px rgba(118,75,162,0.4); }
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: var(--font);
+      background: linear-gradient(135deg, #ffffff 0%, #f5f7fa 50%, #e9ecef 100%);
+      background-attachment: fixed;
+      color: var(--text);
+      line-height: 1.65;
+      padding: 32px 18px 80px;
+      position: relative;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(circle at 20% 30%, rgba(102,126,234,0.03), transparent 50%),
+                  radial-gradient(circle at 80% 70%, rgba(118,75,162,0.03), transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .shell {
+      position: relative;
+      z-index: 1;
+    }
+    .progress-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      width: 0%;
+      z-index: 9999;
+      transition: width 0.3s ease;
+    }
+    .shell { max-width: 1100px; margin: 0 auto; position: relative; z-index: 1; }
+    header {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 16px; justify-content: space-between;
+      margin-bottom: 18px;
+    }
+    h1 { margin: 0; font-size: 32px; letter-spacing: -0.5px; }
+    nav {
+      display: flex; gap: 8px; flex-wrap: wrap;
+    }
+    nav a {
+      text-decoration: none; color: var(--text); padding: 8px 12px;
+      border: 1px solid var(--border); border-radius: 12px; background: var(--card);
+      transition: all 0.3s ease;
+      font-size: 14px;
+    }
+    nav a:hover { 
+      background: var(--accent); 
+      color: white;
+      border-color: var(--accent);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(59,130,246,0.3);
+    }
+    .controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    button {
+      border: none; border-radius: 14px; padding: 10px 14px; cursor: pointer; font-weight: 700;
+      background: linear-gradient(120deg, var(--accent), var(--accent-2));
+      color: white; box-shadow: var(--shadow); transition: all 0.3s ease;
+    }
+    button:hover { 
+      transform: translateY(-2px); 
+      box-shadow: 0 12px 24px rgba(59,130,246,0.25);
+    }
+    button:active { transform: translateY(1px); }
+    .grid {
+      display: grid; gap: 16px;
+    }
+    .card {
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(10px);
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      padding: 36px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+      opacity: 0;
+      transition: all 0.4s ease;
+      transform: translateY(30px);
+      animation: slideUp 0.6s ease forwards;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      margin-bottom: 10px;
+    }
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(102,126,234,0.08), transparent);
+      transition: left 0.5s ease;
+    }
+    .card:hover::before {
+      left: 100%;
+    }
+    .card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 12px 40px rgba(102,126,234,0.2);
+      border-color: var(--accent);
+    }
+    @keyframes slideUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeInScale {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+    .card:nth-child(1) { animation-delay: 0.1s; }
+    .card:nth-child(2) { animation-delay: 0.2s; }
+    .card:nth-child(3) { animation-delay: 0.3s; }
+    .card:nth-child(4) { animation-delay: 0.4s; }
+    .card:nth-child(5) { animation-delay: 0.5s; }
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+      transition: all 0.3s ease;
+    }
+    .card h2 { margin-top: 0; letter-spacing: -0.3px; }
+    .pill {
+      display: inline-block;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: linear-gradient(120deg, #667eea, #764ba2);
+      color: white;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      font-size: 13px;
+      margin-bottom: 8px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 2px 8px rgba(102,126,234,0.2);
+    }
+    .pill:hover {
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 6px 16px rgba(102,126,234,0.4);
+      background: linear-gradient(120deg, #764ba2, #f093fb);
+    }
+    ul { margin: 10px 0 0 18px; padding: 0; }
+    li { margin: 4px 0; }
+    .two-col { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+    .highlight li { 
+      color: #1e40af; 
+      font-weight: 700;
+      background: #dbeafe;
+      padding: 4px 8px;
+      border-radius: 6px;
+      margin: 6px 0;
+      transition: all 0.3s ease;
+    }
+    .tag-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+    .tag { 
+      padding: 6px 9px; 
+      border-radius: 10px; 
+      background: #e0e7ff; 
+      color: #4338ca; 
+      font-size: 13px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    .tag:hover {
+      background: #4338ca;
+      color: white;
+      transform: translateY(-2px);
+    }
+    .table {
+      width: 100%; border-collapse: collapse; margin-top: 8px;
+    }
+    .table th, .table td {
+      border: 1px solid var(--border);
+      padding: 8px 10px;
+      text-align: left;
+      background: var(--card);
+      transition: background 0.2s ease;
+    }
+    .table th { background: #dbeafe; color: #1e40af; font-weight: 700; }
+    .table tr:hover td { background: #f1f5f9; }
+    .section-header {
+      text-align: center;
+      padding: 50px 30px;
+      margin: 40px 0 30px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+      background-size: 200% 200%;
+      animation: gradientShift 4s ease infinite, fadeInScale 0.8s ease forwards;
+      border-radius: var(--radius);
+      box-shadow: 0 20px 50px rgba(102,126,234,0.35);
+      position: relative;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(20px);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .section-header:hover {
+      transform: translateY(-5px) scale(1.01);
+      box-shadow: 0 25px 60px rgba(102,126,234,0.4);
+    }
+    .section-header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+      animation: rotate 10s linear infinite;
+    }
+    @keyframes rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .section-header h2 {
+      margin: 0;
+      color: white;
+      font-size: 42px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      position: relative;
+      z-index: 1;
+      text-shadow: 3px 3px 12px rgba(0,0,0,0.3);
+    }
+    .section-header p {
+      margin: 15px 0 0;
+      color: rgba(255,255,255,0.98);
+      font-size: 18px;
+      position: relative;
+      z-index: 1;
+      font-weight: 500;
+    }
+    .dropdown-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+    }
+    .dropdown-btn {
+      background: linear-gradient(120deg, #667eea, #764ba2);
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 16px;
+      box-shadow: 0 8px 20px rgba(102,126,234,0.3);
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .dropdown-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(102,126,234,0.4);
+    }
+    .dropdown-menu {
+      position: absolute;
+      top: 60px;
+      right: 0;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+      min-width: 250px;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .dropdown-menu.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+    .dropdown-menu a {
+      display: block;
+      padding: 12px 20px;
+      color: var(--text);
+      text-decoration: none;
+      transition: all 0.2s ease;
+      border-left: 3px solid transparent;
+    }
+    .dropdown-menu a:hover {
+      background: #f1f5f9;
+      border-left-color: #667eea;
+      padding-left: 25px;
+    }
+    .dropdown-menu a:first-child {
+      border-top-left-radius: 12px;
+      border-top-right-radius: 12px;
+    }
+    .dropdown-menu a:last-child {
+      border-bottom-left-radius: 12px;
+      border-bottom-right-radius: 12px;
+    }
+    .section-img {
+      width: 100%;
+      max-width: 800px;
+      height: auto;
+      object-fit: contain;
+      border-radius: 12px;
+      margin: 0 auto 16px auto;
+      display: block;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
+      background: #ffffff;
+      padding: 10px;
+    }
+    .section-img:hover {
+      transform: scale(1.02);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+    }
+    @keyframes fadeOut {
+      from { opacity: 1; }
+      to { opacity: 0; }
+    }
+    .fade-out {
+      animation: fadeOut 0.5s ease forwards;
+    }
+    .presentation-controls {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      z-index: 1000;
+    }
+    .control-btn {
+      width: 55px;
+      height: 55px;
+      border: none;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: white;
+      font-size: 22px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 25px rgba(102,126,234,0.4);
+    }
+    .control-btn:hover {
+      transform: scale(1.15);
+      box-shadow: 0 10px 35px rgba(102,126,234,0.5);
+    }
+    .control-btn:active {
+      transform: scale(0.95);
+    }
+    
+    /* Quiz Modal Styles */
+    .quiz-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(10px);
+      z-index: 10000;
+      overflow-y: auto;
+      padding: 20px;
+    }
+    .quiz-modal.active {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .quiz-container {
+      background: white;
+      border-radius: 30px;
+      padding: 50px;
+      max-width: 800px;
+      width: 100%;
+      box-shadow: 0 25px 80px rgba(0,0,0,0.3);
+      position: relative;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .quiz-close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: none;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .quiz-close:hover {
+      transform: rotate(90deg) scale(1.1);
+    }
+    .quiz-title {
+      font-size: 36px;
+      background: linear-gradient(120deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 0 0 30px 0;
+      font-weight: 900;
+    }
+    .question {
+      background: var(--card);
+      padding: 25px;
+      border-radius: 15px;
+      margin-bottom: 25px;
+      border: 2px solid var(--border);
+      transition: all 0.3s ease;
+    }
+    .question:hover {
+      border-color: var(--accent);
+      box-shadow: 0 8px 20px rgba(102,126,234,0.1);
+    }
+    .question-text {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+      margin: 0 0 15px 0;
+    }
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .option {
+      padding: 12px 18px;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: white;
+    }
+    .option:hover {
+      border-color: var(--accent);
+      background: rgba(102,126,234,0.05);
+      transform: translateX(5px);
+    }
+    .submit-quiz {
+      width: 100%;
+      padding: 18px;
+      border: none;
+      border-radius: 15px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: white;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 20px;
+    }
+    .submit-quiz:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(102,126,234,0.4);
+    }
+    .show-answers-btn {
+      width: 100%;
+      padding: 18px;
+      border: none;
+      border-radius: 15px;
+      background: linear-gradient(135deg, #f093fb, #f5576c);
+      color: white;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 15px;
+    }
+    .show-answers-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(245,87,108,0.4);
+    }
+    .option.correct-answer {
+      background: rgba(72,187,120,0.15);
+      border-color: #48bb78;
+      font-weight: 700;
+    }
+    .option.correct-answer::before {
+      content: '✓ ';
+      color: #48bb78;
+      font-weight: 900;
+    }
+    
+    /* Laugh Popup */
+    .laugh-popup {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.95);
+      z-index: 99999;
+      align-items: center;
+      justify-content: center;
+      animation: popupAppear 0.3s ease;
+    }
+    .laugh-popup.active {
+      display: flex;
+    }
+    .laugh-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 30px;
+    }
+    .laugh-monkey {
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 8px solid #ff0000;
+      box-shadow: 0 0 40px rgba(255,0,0,0.8), 0 0 80px rgba(255,0,0,0.5);
+      animation: bounce 0.5s infinite alternate;
+    }
+    @keyframes bounce {
+      from { transform: translateY(0); }
+      to { transform: translateY(-20px); }
+    }
+    .laugh-message {
+      font-size: 72px;
+      font-weight: 900;
+      color: #ff0000;
+      text-align: center;
+      animation: shake 0.5s infinite, rainbow 2s linear infinite;
+      text-shadow: 0 0 20px rgba(255,0,0,0.8), 0 0 40px rgba(255,0,0,0.6);
+      padding: 40px;
+      letter-spacing: 3px;
+      line-height: 1.3;
+    }
+    @keyframes popupAppear {
+      from { opacity: 0; transform: scale(0.5); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    @keyframes shake {
+      0%, 100% { transform: rotate(-2deg); }
+      50% { transform: rotate(2deg); }
+    }
+    @keyframes rainbow {
+      0% { color: #ff0000; }
+      16% { color: #ff8800; }
+      33% { color: #ffff00; }
+      50% { color: #00ff00; }
+      66% { color: #0088ff; }
+      83% { color: #8800ff; }
+      100% { color: #ff0000; }
+    }
+    @media (max-width: 700px) {
+      header { flex-direction: column; align-items: flex-start; }
+      nav { width: 100%; }
+      .section-header h2 { font-size: 28px; }
+      .quiz-container {
+        padding: 30px 20px;
+      }
+      .laugh-message {
+        font-size: 36px;
+        padding: 20px;
+      }
+      .laugh-monkey {
+        width: 200px;
+        height: 200px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="dropdown-container">
+      <button class="dropdown-btn" id="menuBtn">
+        <span>☰</span> Navigation Menu
+      </button>
+      <div class="dropdown-menu" id="dropdownMenu">
+        <a href="#data-formats-section">📊 Data Formats</a>
+        <a href="#common-formats-section">📁 Common Data Formats</a>
+        <a href="#binary-section">⚡ Binary Data Formats</a>
+        <a href="#what">What is Data Format?</a>
+        <a href="#importance">Importance</a>
+        <a href="#classification">Classification</a>
+        <a href="#examples">Everyday Examples</a>
+        <a href="#proscons">Pros & Cons</a>
+        <a href="#sql-nosql">SQL & NoSQL</a>
+        <a href="#apis">APIs</a>
+        <a href="#config">Configuration Files</a>
+        <a href="#ai">AI & ML</a>
+        <a href="#choosing">Choosing Formats</a>
+        <a href="#mistakes">Common Mistakes</a>
+      </div>
+    </div>
+
+    <div class="progress-bar" id="progressBar"></div>
+    
+    <div style="text-align: center; margin-bottom: 60px; padding: 60px 30px; background: linear-gradient(135deg, rgba(102,126,234,0.08), rgba(118,75,162,0.08)); border-radius: 30px; backdrop-filter: blur(10px); border: 2px solid rgba(102,126,234,0.1); box-shadow: 0 20px 60px rgba(0,0,0,0.08); position: relative; overflow: hidden;">
+      <div style="position: absolute; top: -50px; right: -50px; width: 200px; height: 200px; background: radial-gradient(circle, rgba(102,126,234,0.15), transparent); border-radius: 50%; animation: float 6s ease-in-out infinite;"></div>
+      <div style="position: absolute; bottom: -50px; left: -50px; width: 200px; height: 200px; background: radial-gradient(circle, rgba(118,75,162,0.15), transparent); border-radius: 50%; animation: float 8s ease-in-out infinite;"></div>
+      <div class="pill" style="font-size: 15px; padding: 10px 18px; position: relative; z-index: 1;">Interactive Presentation</div>
+      <h1 style="margin: 20px 0; font-size: 56px; background: linear-gradient(120deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-weight: 900; letter-spacing: -1px; position: relative; z-index: 1; animation: glow 3s ease-in-out infinite;">Data Formats</h1>
+      <p style="color: var(--muted); font-size: 22px; font-weight: 600; position: relative; z-index: 1;">Concepts & Real-World Uses</p>
+      <div style="margin: 35px auto 20px; padding: 25px 35px; background: rgba(255,255,255,0.8); backdrop-filter: blur(15px); border-radius: 20px; display: inline-block; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 2px solid rgba(102,126,234,0.2); position: relative; z-index: 1;">
+        <p style="margin: 0 0 12px 0; font-size: 14px; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); font-weight: 700;">Presented By</p>
+        <div style="display: flex; gap: 25px; flex-wrap: wrap; justify-content: center; align-items: center;">
+          <div style="text-align: center;">
+            <img src="https://lh3.googleusercontent.com/d/1HtRSl4BPaNLmr10Z84kST0_COm9ovFwz" alt="Ronald AJusan" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin: 0 auto 8px; box-shadow: 0 8px 20px rgba(102,126,234,0.4); border: 3px solid transparent; background: linear-gradient(white, white) padding-box, linear-gradient(135deg, #667eea, #764ba2) border-box;">
+            <p style="margin: 0; font-weight: 700; font-size: 16px; color: var(--text);">Ronald AJusan</p>
+          </div>
+          <div style="text-align: center;">
+            <img src="https://lh3.googleusercontent.com/d/1gLNUIgPEcIdWC93CQfNPlcbNzAG85GrQ" alt="Kent Madrideo" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin: 0 auto 8px; box-shadow: 0 8px 20px rgba(102,126,234,0.4); border: 3px solid transparent; background: linear-gradient(white, white) padding-box, linear-gradient(135deg, #667eea, #764ba2) border-box;">
+            <p style="margin: 0; font-weight: 700; font-size: 16px; color: var(--text);">Kent Madrideo</p>
+          </div>
+          <div style="text-align: center;">
+            <img src="https://lh3.googleusercontent.com/d/1xxgvedR4hghJEOW2oG3NnChm12c-MJ8S" alt="Dweight Mandawe" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin: 0 auto 8px; box-shadow: 0 8px 20px rgba(102,126,234,0.4); border: 3px solid transparent; background: linear-gradient(white, white) padding-box, linear-gradient(135deg, #667eea, #764ba2) border-box;">
+            <p style="margin: 0; font-weight: 700; font-size: 16px; color: var(--text);">Dweight Mandawe</p>
+          </div>
+        </div>
+      </div>
+      <button id="toggleHighlights" style="margin-top: 20px; position: relative; z-index: 1; animation: float 4s ease-in-out infinite;">💡 Highlight Key Points</button>
+      <button id="openQuiz" style="margin-top: 20px; margin-left: 15px; position: relative; z-index: 1; animation: float 4.5s ease-in-out infinite;">📝 Take Quiz</button>
+    </div>
+    
+    <div class="presentation-controls">
+      <button class="control-btn" id="fullscreenBtn" title="Fullscreen (F)">⛶</button>
+    </div>
+
+    <div class="grid">
+      <div class="section-header" id="data-formats-section" style="animation-delay: 0.1s;">
+        <h2>📊 DATA FORMATS</h2>
+        <p>Understanding how information is structured and stored</p>
+      </div>
+
+      <section class="card" id="what">
+        <img src="https://www.labelplanet.co.uk/_cache/_glossary_inpage/1740x914/449.webp" alt="Different file format icons" class="section-img" onerror="this.src='https://www.labelplanet.co.uk/images/glossary/file-format-graphic.png'">
+        <h2>A data format</h2>
+        <p>A data format is the way data is structured, organized, and stored so that computers and people can read, process, and exchange information correctly.</p>
+        <div class="two-col">
+          <div>
+            <div class="pill">Example</div>
+            <ul>
+              <li>As text: "20"</li>
+              <li>As a number: 20</li>
+              <li>Inside JSON: "age": 20</li>
+            </ul>
+          </div>
+          <div>
+            <div class="pill">Note</div>
+            <p>Each representation follows a different data format.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" id="importance">
+        <h2>Importance of Data Formats</h2>
+        <ul>
+          <li>Enable communication between systems (e.g., mobile app → web server via JSON).</li>
+          <li>Ensure data accuracy and consistency (e.g., dates as YYYY-MM-DD).</li>
+          <li>Improve efficiency and performance (binary loads faster than text).</li>
+          <li>Support data storage and retrieval (databases rely on proper formats).</li>
+          <li>Make data understandable to humans (text-based formats are readable/editable).</li>
+        </ul>
+      </section>
+
+      <section class="card" id="classification">
+        <img src="https://lh3.googleusercontent.com/d/1jX7RfRi2GPe5_JfRjGtCVg2ICd4POAaf" alt="Classification of Data Formats" class="section-img" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 800 400%27%3E%3Crect fill=%27%23f8f9fa%27 width=%27800%27 height=%27400%27/%3E%3Ctext x=%27400%27 y=%27180%27 font-family=%27Arial%27 font-size=%2732%27 fill=%27%234CAF50%27 text-anchor=%27middle%27 font-weight=%27bold%27%3EStructured%3C/text%3E%3Ctext x=%27400%27 y=%27220%27 font-family=%27Arial%27 font-size=%2732%27 fill=%27%232196F3%27 text-anchor=%27middle%27 font-weight=%27bold%27%3ESemi-Structured%3C/text%3E%3Ctext x=%27400%27 y=%27260%27 font-family=%27Arial%27 font-size=%2732%27 fill=%27%23FF9800%27 text-anchor=%27middle%27 font-weight=%27bold%27%3EUnstructured%3C/text%3E%3C/svg%3E'">
+        <h2>Classification</h2>
+        <div class="two-col">
+          <div>
+            <div class="pill">Structured Data</div>
+            <p><strong>DEFINITION:</strong><br>Structured data follows a fixed and organized structure, usually in rows and columns.</p>
+            <p><strong>Characteristics:</strong></p>
+            <ul>
+              <li>Predefined format</li>
+              <li>Easy to search and analyze</li>
+              <li>Stored in databases</li>
+            </ul>
+            <p><strong>Examples:</strong> SQL databases, Excel tables, CSV files</p>
+            <p><strong>Uses:</strong> Banking systems, school records, inventory systems</p>
+          </div>
+          <div>
+            <div class="pill">Semi-Structured Data</div>
+            <p><strong>DEFINITION:</strong><br>Semi-structured data has some structure, but it is flexible and does not follow strict tables.</p>
+            <p><strong>Characteristics:</strong></p>
+            <ul>
+              <li>Uses tags or key–value pairs</li>
+              <li>Flexible structure</li>
+              <li>Easy to share across systems</li>
+            </ul>
+            <p><strong>Examples:</strong> JSON, XML, YAML</p>
+            <p><strong>Uses:</strong> Web APIs, mobile apps, configuration files</p>
+          </div>
+          <div>
+            <div class="pill">Unstructured Data</div>
+            <p><strong>DEFINITION:</strong><br>Unstructured data has no predefined format or structure.</p>
+            <p><strong>Characteristics:</strong></p>
+            <ul>
+              <li>Difficult to organize</li>
+              <li>Requires special processing</li>
+              <li>Large in volume</li>
+            </ul>
+            <p><strong>Examples:</strong> Images, videos, audio, social posts, emails</p>
+            <p><strong>Uses:</strong> Social platforms, AI/ML, multimedia systems</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" id="examples">
+        <h2>Examples of Data in Everyday Life</h2>
+        <table class="table">
+          <thead><tr><th>Everyday item</th><th>Data formats used</th></tr></thead>
+          <tbody>
+            <tr><td>Text message</td><td>TXT</td></tr>
+            <tr><td>Contact list</td><td>Structured database</td></tr>
+            <tr><td>Online form</td><td>JSON</td></tr>
+            <tr><td>Photos</td><td>JPG/PNG</td></tr>
+            <tr><td>Music</td><td>MP3</td></tr>
+            <tr><td>Videos</td><td>MP4</td></tr>
+            <tr><td>Online shopping</td><td>JSON + SQL</td></tr>
+            <tr><td>School records</td><td>CSV/SQL</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="card" id="proscons">
+        <h2>Advantages vs Disadvantages</h2>
+        <div class="two-col">
+          <div>
+            <div class="pill">Advantage</div>
+            <ul>
+              <li>Organizes data clearly</li>
+              <li>Makes data easy to share</li>
+              <li>Improves system compatibility</li>
+              <li>Supports automation and AI</li>
+              <li>Reduces data errors</li>
+            </ul>
+          </div>
+          <div>
+            <div class="pill">Disadvantage</div>
+            <ul>
+              <li>Some formats are complex</li>
+              <li>Large file sizes (text formats)</li>
+              <li>Not all formats are human-readable</li>
+              <li>Wrong format choice causes inefficiency</li>
+              <li>Requires conversion between formats</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <div class="section-header" id="common-formats-section" style="animation-delay: 0.2s;">
+        <h2>📁 Common Data Formats</h2>
+        <p>Text, Images, Audio & Video formats explained</p>
+      </div>
+
+      <section class="card" id="formats">
+        <p style="text-align: center; font-size: 18px; color: var(--muted);">Data formats are used to store and organize digital information. Common categories: text, images, audio, and video. Different formats are suited for different uses and devices.</p>
+      </section>
+
+      <section class="card" id="text-formats">
+        <img src="https://lh3.googleusercontent.com/d/1gBrTrPhYddpo6CYvj3ey-WtkAyYWpV0d" alt="Text Formats TXT and CSV" class="section-img" onerror="this.style.display='none'">
+        <h2 style="text-align: center; color: #1e40af; font-size: 28px;">TEXT FORMATS: TXT & CSV</h2>
+        <div class="two-col">
+          <div>
+            <div class="pill">TXT (Plain Text Files)</div>
+            <ul>
+              <li>Stores only simple text with no formatting</li>
+              <li>Extremely small and compatible with all systems</li>
+              <li>Used for notes, logs, and documentation</li>
+            </ul>
+          </div>
+          <div>
+            <div class="pill">CSV (Comma-Separated Values)</div>
+            <ul>
+              <li>Stores data in table or spreadsheet format</li>
+              <li>Columns separated by commas</li>
+              <li>Common in Excel, databases, and data analysis</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" id="text-json-xml">
+        <img src="https://lh3.googleusercontent.com/d/1ViNbbzjNyKNFIC0VCYEHnpBBUoWYm5EZ" alt="JSON and XML Formats" class="section-img" onerror="this.style.display='none'">
+        <h2 style="text-align: center; color: #1e40af; font-size: 28px;">TEXT FORMATS: JSON & XML</h2>
+        <div class="two-col">
+          <div>
+            <div class="pill">JSON (JavaScript Object Notation)</div>
+            <ul>
+              <li>Stores structured data in key–value pairs</li>
+              <li>Lightweight and human-readable</li>
+              <li>Used in web apps and APIs</li>
+            </ul>
+          </div>
+          <div>
+            <div class="pill">XML (Extensible Markup Language)</div>
+            <ul>
+              <li>Uses tags to describe and structure data</li>
+              <li>Flexible but more complex and verbose</li>
+              <li>Common in enterprise systems and configurations</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" id="text-yaml">
+        <h2 style="text-align: center; color: #1e40af; font-size: 28px;">TEXT FORMAT: YAML</h2>
+        <div>
+          <div class="pill">YAML</div>
+          <ul>
+            <li>Human-friendly structured text format</li>
+            <li>Designed for configuration and automation</li>
+            <li>Popular in DevOps and cloud technologies</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="card" id="comparing-text">
+        <h2 style="text-align: center; color: #1e40af; font-size: 28px;">Comparing Text Formats</h2>
+        <ul style="font-size: 16px;">
+          <li><strong>TXT</strong> — simple unformatted text</li>
+          <li><strong>CSV</strong> — table-style structured data</li>
+          <li><strong>JSON & XML</strong> — complex structured data</li>
+          <li><strong>YAML</strong> — readable configuration data</li>
+        </ul>
+      </section>
+
+      <section class="card" id="image-formats">
+        <img src="https://lh3.googleusercontent.com/d/1Pr2pCC7tfW-BYf8LK77Hb8oTDbLCZfau" alt="Image Formats JPG and PNG" class="section-img" onerror="this.style.display='none'">
+        <h2 style="text-align: center; color: #1e40af; font-size: 28px;">IMAGE FORMATS: JPG & PNG</h2>
+        <div class="two-col">
+          <div>
+            <div class="pill">JPG / JPEG</div>
+            <ul>
+              <li>Best for photos and realistic images</li>
+              <li>Uses lossy compression to reduce size</li>
+              <li>Very common in cameras and websites</li>
+            </ul>
+          </div>
+          <div>
+            <div class="pill">PNG</div>
+            <ul>
+              <li>Lossless compression keeps full quality</li>
+              <li>Supports transparency</li>
+              <li>Ideal for logos, icons, and graphics</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" id="image-gif-svg">
+        <h2 style="text-align: center; color: #1e40af; font-size: 28px;">IMAGE FORMATS: GIF & SVG</h2>
+        <div class="two-col">
+          <div>
+            <div class="pill">GIF</div>
+            <ul>
+              <li>Supports simple animations</li>
+              <li>Limited to 256 colors</li>
+              <li>Popular for memes and reaction images</li>
+            </ul>
+          </div>
+          <div>
+            <div class="pill">SVG</div>
+            <ul>
+              <li>Vector-based graphics</li>
+              <li>Can scale without losing quality</li>
+              <li>Used for icons, logos, and diagrams</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" id="audio-formats">
+        <img src="https://lh3.googleusercontent.com/d/1gC5ytr7sJEUrBKEAcja1HnX5i1-D0RNz" alt="Audio Formats MP3 and WAV" class="section-img" onerror="this.style.display='none'">
+        <h2 style="text-align: center; color: #1e40af; font-size: 28px;">AUDIO FORMATS: MP3 & WAV</h2>
+        <div class="two-col">
+          <div>
+            <div class="pill">MP3</div>
+            <ul>
+              <li>Compressed audio format</li>
+              <li>Small file size with good quality</li>
+              <li>Common for music and streaming</li>
+            </ul>
+          </div>
+          <div>
+            <div class="pill">WAV</div>
+            <ul>
+              <li>Uncompressed high-quality audio</li>
+              <li>Very large file sizes</li>
+              <li>Used in studios and professional recording</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" id="audio-aac">
+        <h2 style="text-align: center; color: #1e40af; font-size: 28px;">AUDIO FORMAT: AAC</h2>
+        <div>
+          <div class="pill">AAC</div>
+          <ul>
+            <li>Advanced compressed audio format</li>
+            <li>Better quality than MP3 at the same file size</li>
+            <li>Used by YouTube, Apple Music, and streaming platforms</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="card" id="video-formats">
+        <img src="https://lh3.googleusercontent.com/d/1OVBC3UVpNzUkMn0MJjoRhFpP-GnCVofd" alt="Video Formats MP4 and AVI" class="section-img" onerror="this.style.display='none'">
+        <h2 style="text-align: center; color: #1e40af; font-size: 28px;">VIDEO FORMATS: MP4 & AVI</h2>
+        <div class="two-col">
+          <div>
+            <div class="pill">MP4</div>
+            <ul>
+              <li>Most widely supported video format</li>
+              <li>Good quality with efficient compression</li>
+              <li>Works on almost all devices and platforms</li>
+            </ul>
+          </div>
+          <div>
+            <div class="pill">AVI</div>
+            <ul>
+              <li>Older Microsoft video format</li>
+              <li>Larger file sizes</li>
+              <li>Still used in editing and archiving</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" id="video-mkv">
+        <h2 style="text-align: center; color: #1e40af; font-size: 28px;">VIDEO FORMAT: MKV</h2>
+        <div>
+          <div class="pill">MKV</div>
+          <ul>
+            <li>Flexible video container format</li>
+            <li>Supports multiple subtitles and audio tracks</li>
+            <li>Popular for high-quality media and movies</li>
+          </ul>
+        </div>
+      </section>
+
+      <div class="section-header" id="binary-section" style="animation-delay: 0.3s;">
+        <h2>⚡ Binary Data Formats</h2>
+        <p>Efficient data storage in raw bytes</p>
+      </div>
+
+      <section class="card" id="binary">
+        <img src="https://lh3.googleusercontent.com/d/19LFn5qIDMFZaP6MsOiE5Vvx7zNTT40g5" alt="Binary Files" class="section-img" onerror="this.style.display='none'">
+        <h2>Binary Files</h2>
+        <div class="two-col">
+          <div>
+            <div class="pill">Technical Characteristics</div>
+            <ul>
+              <li>Stored as raw bytes (0s and 1s)</li>
+              <li>Not human-readable without tools</li>
+              <li>Platform-dependent if not designed carefully</li>
+              <li>Efficient for large data and real-time processing</li>
+            </ul>
+          </div>
+          <div>
+            <div class="pill">Real-World Usage</div>
+            <ul>
+              <li>Images (PNG, JPEG, BMP)</li>
+              <li>Audio (MP3, WAV)</li>
+              <li>Video (MP4, AVI)</li>
+              <li>Executable programs (.exe, .bin)</li>
+              <li>Game assets and simulations</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" id="protobuf">
+        <img src="https://lh3.googleusercontent.com/d/1ryHMuOg9bAwmsmLqdW5Bp0ebRlL7wJSg" alt="Protocol Buffers" class="section-img" onerror="this.style.display='none'">
+        <h2>Protocol Buffers (Protobuf)</h2>
+        <div class="two-col">
+          <div>
+            <div class="pill">Key Features</div>
+            <ul>
+              <li>Compact binary representation</li>
+              <li>Faster than JSON or XML</li>
+              <li>Strongly typed schema (.proto files)</li>
+              <li>Backward/forward compatibility</li>
+            </ul>
+          </div>
+          <div>
+            <div class="pill">Real-World Applications</div>
+            <ul>
+              <li>Microservices communication</li>
+              <li>gRPC APIs</li>
+              <li>Distributed systems</li>
+              <li>Cloud services</li>
+              <li>Mobile applications</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" id="sql-nosql">
+        <img src="https://lh3.googleusercontent.com/d/1dWmEL7VvccM61dQXGW2A7pozw8OhmO-r" alt="SQL vs NoSQL" class="section-img" onerror="this.style.display='none'">
+        <h2>SQL (Structured) vs NoSQL (JSON-Based)</h2>
+        <div class="two-col">
+          <div>
+            <div class="pill">SQL (Structured Data)</div>
+            <ul>
+              <li>Schema-based, relational</li>
+              <li>ACID compliance</li>
+              <li>Supports complex queries</li>
+              <li>Apps: Banking, inventory, ERP, student systems</li>
+            </ul>
+          </div>
+          <div>
+            <div class="pill">NoSQL (JSON-Based)</div>
+            <ul>
+              <li>Schema-less or flexible schema</li>
+              <li>Document-based storage</li>
+              <li>Horizontally scalable</li>
+              <li>Apps: Social, e-commerce, CMS, real-time analytics</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" id="apis">
+        <img src="https://lh3.googleusercontent.com/d/1ViNbbzjNyKNFIC0VCYEHnpBBUoWYm5EZ" alt="APIs JSON" class="section-img" onerror="this.style.display='none'">
+        <h2>APIs (JSON)</h2>
+        <div class="two-col">
+          <div>
+            <div class="pill">Why JSON is Preferred</div>
+            <ul>
+              <li>Human-readable, lightweight</li>
+              <li>Language-independent</li>
+              <li>Native support in JavaScript</li>
+            </ul>
+          </div>
+          <div>
+            <div class="pill">Real-World Applications</div>
+            <ul>
+              <li>RESTful APIs</li>
+              <li>Mobile app backends</li>
+              <li>Web services</li>
+              <li>Cloud platforms</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" id="config">
+        <img src="https://lh3.googleusercontent.com/d/1-Uu9A0Ukvm4m-Cg8gvfwz8auQbZ8LjH9" alt="Configuration Files" class="section-img" onerror="this.style.display='none'">
+        <h2>Configuration Files</h2>
+        <div class="two-col">
+          <div>
+            <div class="pill">Common Uses</div>
+            <ul>
+              <li>Application settings</li>
+              <li>Server configuration</li>
+              <li>Environment variables</li>
+              <li>Deployment scripts</li>
+            </ul>
+          </div>
+          <div>
+            <div class="pill">Real-World Examples</div>
+            <ul>
+              <li>package.json in Node.js</li>
+              <li>docker-compose.yml in containerized systems</li>
+              <li>config.yaml in cloud deployments</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" id="ai">
+        <h2>Data Formats in AI & Machine Learning</h2>
+        <div class="two-col">
+          <div>
+            <div class="pill">Common Formats</div>
+            <ul>
+              <li>CSV – simple datasets</li>
+              <li>JSON – metadata/annotations</li>
+              <li>HDF5 – large numerical datasets</li>
+              <li>TFRecord – TensorFlow training data</li>
+              <li>Pickle – Python object serialization (security risks)</li>
+            </ul>
+          </div>
+          <div>
+            <div class="pill">Real-World Applications</div>
+            <ul>
+              <li>Training deep learning models</li>
+              <li>Storing neural network weights</li>
+              <li>Managing labeled datasets</li>
+              <li>Exchanging models between systems</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" id="choosing">
+        <h2>Choosing the Right Data Format</h2>
+        <table class="table">
+          <thead><tr><th>Factor</th><th>Consideration</th></tr></thead>
+          <tbody>
+            <tr><td>Performance</td><td>Binary formats are faster</td></tr>
+            <tr><td>Readability</td><td>Text formats are easier to debug</td></tr>
+            <tr><td>Scalability</td><td>NoSQL formats scale better</td></tr>
+            <tr><td>Compatibility</td><td>JSON and Protobuf are cross-platform</td></tr>
+            <tr><td>Security</td><td>Binary and encrypted formats offer better protection</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="card" id="mistakes">
+        <h2>Common Mistakes</h2>
+        <ul>
+          <li>Using JSON for large binary data instead of binary formats</li>
+          <li>Ignoring schema validation in flexible formats</li>
+          <li>Overusing text formats where performance is critical</li>
+          <li>Poor versioning of serialized data</li>
+          <li>Security risks from unsafe deserialization (e.g., Pickle)</li>
+          <li>Mixing incompatible formats across systems</li>
+        </ul>
+      </section>
+
+      <section class="card" id="realworld">
+        <h2>Real-World Applications of Data Formats</h2>
+        <div class="tag-row">
+          <div class="tag">Banking – SQL, encrypted binary</div>
+          <div class="tag">Healthcare – structured DB + secure imaging</div>
+          <div class="tag">Gaming – binary assets</div>
+          <div class="tag">IoT – Protobuf, binary telemetry</div>
+          <div class="tag">Cloud – JSON APIs, YAML configs</div>
+          <div class="tag">AI – HDF5, TFRecord, JSON metadata</div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- Quiz Modal -->
+  <div class="quiz-modal" id="quizModal">
+    <div class="quiz-container">
+      <button class="quiz-close" id="closeQuiz">×</button>
+      <h2 class="quiz-title">📝 Data Formats Quiz</h2>
+      
+      <div class="question">
+        <p class="question-text">1. What is a data format?</p>
+        <div class="options">
+          <label class="option"><input type="radio" name="q1" value="A"> A. A computer hardware component</label>
+          <label class="option"><input type="radio" name="q1" value="B"> B. A way data is structured, organized, and stored</label>
+          <label class="option"><input type="radio" name="q1" value="C"> C. A programming language</label>
+          <label class="option"><input type="radio" name="q1" value="D"> D. A type of operating system</label>
+        </div>
+      </div>
+
+      <div class="question">
+        <p class="question-text">2. Which representation shows the number stored as text?</p>
+        <div class="options">
+          <label class="option"><input type="radio" name="q2" value="A"> A. 20</label>
+          <label class="option"><input type="radio" name="q2" value="B"> B. age: 20</label>
+          <label class="option"><input type="radio" name="q2" value="C"> C. "20"</label>
+          <label class="option"><input type="radio" name="q2" value="D"> D. 0010100</label>
+        </div>
+      </div>
+
+      <div class="question">
+        <p class="question-text">3. Why are data formats important in system communication?</p>
+        <div class="options">
+          <label class="option"><input type="radio" name="q3" value="A"> A. They reduce internet speed</label>
+          <label class="option"><input type="radio" name="q3" value="B"> B. They enable systems to exchange data correctly</label>
+          <label class="option"><input type="radio" name="q3" value="C"> C. They remove the need for databases</label>
+          <label class="option"><input type="radio" name="q3" value="D"> D. They replace programming languages</label>
+        </div>
+      </div>
+
+      <div class="question">
+        <p class="question-text">4. Which date format helps ensure data consistency?</p>
+        <div class="options">
+          <label class="option"><input type="radio" name="q4" value="A"> A. MM/DD/YY</label>
+          <label class="option"><input type="radio" name="q4" value="B"> B. DD-MM-YY</label>
+          <label class="option"><input type="radio" name="q4" value="C"> C. YYYY-MM-DD</label>
+          <label class="option"><input type="radio" name="q4" value="D"> D. Month-Day-Year</label>
+        </div>
+      </div>
+
+      <div class="question">
+        <p class="question-text">5. Which type of data follows rows and columns?</p>
+        <div class="options">
+          <label class="option"><input type="radio" name="q5" value="A"> A. Unstructured data</label>
+          <label class="option"><input type="radio" name="q5" value="B"> B. Semi-structured data</label>
+          <label class="option"><input type="radio" name="q5" value="C"> C. Binary data</label>
+          <label class="option"><input type="radio" name="q5" value="D"> D. Structured data</label>
+        </div>
+      </div>
+
+      <div class="question">
+        <p class="question-text">6. Which is an example of structured data?</p>
+        <div class="options">
+          <label class="option"><input type="radio" name="q6" value="A"> A. Social media post</label>
+          <label class="option"><input type="radio" name="q6" value="B"> B. MP4 video</label>
+          <label class="option"><input type="radio" name="q6" value="C"> C. CSV file</label>
+          <label class="option"><input type="radio" name="q6" value="D"> D. Audio recording</label>
+        </div>
+      </div>
+
+      <div class="question">
+        <p class="question-text">7. What characteristic best describes semi-structured data?</p>
+        <div class="options">
+          <label class="option"><input type="radio" name="q7" value="A"> A. No format at all</label>
+          <label class="option"><input type="radio" name="q7" value="B"> B. Fixed rows and columns</label>
+          <label class="option"><input type="radio" name="q7" value="C"> C. Uses tags or key–value pairs</label>
+          <label class="option"><input type="radio" name="q7" value="D"> D. Only binary</label>
+        </div>
+      </div>
+
+      <div class="question">
+        <p class="question-text">8. JSON, XML, and YAML are examples of:</p>
+        <div class="options">
+          <label class="option"><input type="radio" name="q8" value="A"> A. Structured data</label>
+          <label class="option"><input type="radio" name="q8" value="B"> B. Semi-structured data</label>
+          <label class="option"><input type="radio" name="q8" value="C"> C. Unstructured data</label>
+          <label class="option"><input type="radio" name="q8" value="D"> D. Binary-only data</label>
+        </div>
+      </div>
+
+      <div class="question">
+        <p class="question-text">9. Which of the following is unstructured data?</p>
+        <div class="options">
+          <label class="option"><input type="radio" name="q9" value="A"> A. Excel spreadsheet</label>
+          <label class="option"><input type="radio" name="q9" value="B"> B. SQL table</label>
+          <label class="option"><input type="radio" name="q9" value="C"> C. JSON API response</label>
+          <label class="option"><input type="radio" name="q9" value="D"> D. Video file</label>
+        </div>
+      </div>
+
+      <div class="question">
+        <p class="question-text">10. Which format is commonly used for photos?</p>
+        <div class="options">
+          <label class="option"><input type="radio" name="q10" value="A"> A. TXT</label>
+          <label class="option"><input type="radio" name="q10" value="B"> B. CSV</label>
+          <label class="option"><input type="radio" name="q10" value="C"> C. JPG</label>
+          <label class="option"><input type="radio" name="q10" value="D"> D. MP3</label>
+        </div>
+      </div>
+
+      <div class="question">
+        <p class="question-text">11. What is the main advantage of text-based formats?</p>
+        <div class="options">
+          <label class="option"><input type="radio" name="q11" value="A"> A. Faster than binary always</label>
+          <label class="option"><input type="radio" name="q11" value="B"> B. Human-readable and editable</label>
+          <label class="option"><input type="radio" name="q11" value="C"> C. Smaller than all binary files</label>
+          <label class="option"><input type="radio" name="q11" value="D"> D. Used only in databases</label>
+        </div>
+      </div>
+
+      <div class="question">
+        <p class="question-text">12. Which is a disadvantage of text formats?</p>
+        <div class="options">
+          <label class="option"><input type="radio" name="q11" value="A"> A. Hard to read</label>
+          <label class="option"><input type="radio" name="q12" value="B"> B. Large file sizes</label>
+          <label class="option"><input type="radio" name="q12" value="C"> C. Cannot be shared</label>
+          <label class="option"><input type="radio" name="q12" value="D"> D. Not supported by systems</label>
+        </div>
+      </div>
+
+      <div class="question">
+        <p class="question-text">13. What does CSV stand for?</p>
+        <div class="options">
+          <label class="option"><input type="radio" name="q13" value="A"> A. Common Simple Values</label>
+          <label class="option"><input type="radio" name="q13" value="B"> B. Compressed Storage Volume</label>
+          <label class="option"><input type="radio" name="q13" value="C"> C. Comma-Separated Values</label>
+          <label class="option"><input type="radio" name="q13" value="D"> D. Central System Variables</label>
+        </div>
+      </div>
+
+      <div class="question">
+        <p class="question-text">14. Which format stores data in key–value pairs and is widely used in APIs?</p>
+        <div class="options">
+          <label class="option"><input type="radio" name="q14" value="A"> A. CSV</label>
+          <label class="option"><input type="radio" name="q14" value="B"> B. JSON</label>
+          <label class="option"><input type="radio" name="q14" value="C"> C. TXT</label>
+          <label class="option"><input type="radio" name="q14" value="D"> D. WAV</label>
+        </div>
+      </div>
+
+      <div class="question">
+        <p class="question-text">15. Which image format supports transparency and lossless quality?</p>
+        <div class="options">
+          <label class="option"><input type="radio" name="q15" value="A"> A. JPG</label>
+          <label class="option"><input type="radio" name="q15" value="B"> B. GIF</label>
+          <label class="option"><input type="radio" name="q15" value="C"> C. PNG</label>
+          <label class="option"><input type="radio" name="q15" value="D"> D. BMP</label>
+        </div>
+      </div>
+
+      <div class="question">
+        <p class="question-text">16. Which audio format is uncompressed and high quality?</p>
+        <div class="options">
+          <label class="option"><input type="radio" name="q16" value="A"> A. MP3</label>
+          <label class="option"><input type="radio" name="q16" value="B"> B. AAC</label>
+          <label class="option"><input type="radio" name="q16" value="C"> C. WAV</label>
+          <label class="option"><input type="radio" name="q16" value="D"> D. OGG</label>
+        </div>
+      </div>
+
+      <div class="question">
+        <p class="question-text">17. What is the most widely supported video format?</p>
+        <div class="options">
+          <label class="option"><input type="radio" name="q17" value="A"> A. AVI</label>
+          <label class="option"><input type="radio" name="q17" value="B"> B. MKV</label>
+          <label class="option"><input type="radio" name="q17" value="C"> C. FLV</label>
+          <label class="option"><input type="radio" name="q17" value="D"> D. MP4</label>
+        </div>
+      </div>
+
+      <div class="question">
+        <p class="question-text">18. Why are binary formats efficient?</p>
+        <div class="options">
+          <label class="option"><input type="radio" name="q18" value="A"> A. They are human-readable</label>
+          <label class="option"><input type="radio" name="q18" value="B"> B. They store raw bytes</label>
+          <label class="option"><input type="radio" name="q18" value="C"> C. They use commas and tags</label>
+          <label class="option"><input type="radio" name="q18" value="D"> D. They require text editors</label>
+        </div>
+      </div>
+
+      <div class="question">
+        <p class="question-text">19. Which technology uses Protocol Buffers for fast communication?</p>
+        <div class="options">
+          <label class="option"><input type="radio" name="q19" value="A"> A. Email systems</label>
+          <label class="option"><input type="radio" name="q19" value="B"> B. gRPC APIs</label>
+          <label class="option"><input type="radio" name="q19" value="C"> C. Text editors</label>
+          <label class="option"><input type="radio" name="q19" value="D"> D. Spreadsheet apps</label>
+        </div>
+      </div>
+
+      <div class="question">
+        <p class="question-text">20. Which data format is commonly used in AI and machine learning datasets?</p>
+        <div class="options">
+          <label class="option"><input type="radio" name="q20" value="A"> A. MP3</label>
+          <label class="option"><input type="radio" name="q20" value="B"> B. JPG</label>
+          <label class="option"><input type="radio" name="q20" value="C"> C. CSV</label>
+          <label class="option"><input type="radio" name="q20" value="D"> D. AVI</label>
+        </div>
+      </div>
+
+      <button class="submit-quiz" id="submitQuiz">Submit Quiz</button>
+      <button class="show-answers-btn" id="showAnswers">🔍 Show Correct Answers</button>
+    </div>
+  </div>
+
+  <!-- Laugh Popup -->
+  <div class="laugh-popup" id="laughPopup">
+    <div class="laugh-content">
+      <img src="https://lh3.googleusercontent.com/d/1922BbuLHimy9zoxwqcq1LWh-9RWFCamC" alt="Laughing Monkey" class="laugh-monkey">
+      <div class="laugh-message">HAHAHAHAHHAHAHAHAHAHHAHAHAHAHHAHAHAHHAHAHAHAHAHAHAHHAHAHAHAHAHAHAHAHAHAHAH</div>
+    </div>
+  </div>
+
+  <script>
+    // Progress bar
+    function updateProgressBar() {
+      const scrollPercent = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+      document.getElementById('progressBar').style.width = scrollPercent + '%';
+    }
+    window.addEventListener('scroll', updateProgressBar);
+
+    // Quiz Modal
+    const quizModal = document.getElementById('quizModal');
+    const openQuizBtn = document.getElementById('openQuiz');
+    const closeQuizBtn = document.getElementById('closeQuiz');
+    const submitQuizBtn = document.getElementById('submitQuiz');
+    const showAnswersBtn = document.getElementById('showAnswers');
+    const laughPopup = document.getElementById('laughPopup');
+
+    const correctAnswers = {
+      q1: 'B', q2: 'C', q3: 'B', q4: 'C', q5: 'D',
+      q6: 'C', q7: 'C', q8: 'B', q9: 'D', q10: 'C',
+      q11: 'B', q12: 'B', q13: 'C', q14: 'B', q15: 'C',
+      q16: 'C', q17: 'D', q18: 'B', q19: 'B', q20: 'C'
+    };
+
+    openQuizBtn.addEventListener('click', () => {
+      quizModal.classList.add('active');
+    });
+
+    closeQuizBtn.addEventListener('click', () => {
+      quizModal.classList.remove('active');
+    });
+
+    quizModal.addEventListener('click', (e) => {
+      if (e.target === quizModal) {
+        quizModal.classList.remove('active');
+      }
+    });
+
+    submitQuizBtn.addEventListener('click', () => {
+      let score = 0;
+      let total = 20;
+      
+      for (let i = 1; i <= total; i++) {
+        const selected = document.querySelector(`input[name="q${i}"]:checked`);
+        if (selected && selected.value === correctAnswers[`q${i}`]) {
+          score++;
+        }
+      }
+      
+      const percentage = (score / total * 100).toFixed(1);
+      let message = '';
+      
+      if (percentage >= 90) message = '🎉 Excellent! You\'re a Data Format expert!';
+      else if (percentage >= 75) message = '👏 Great job! You have strong knowledge!';
+      else if (percentage >= 60) message = '👍 Good effort! Keep learning!';
+      else message = '📚 Keep studying! You\'ll get better!';
+      
+      alert(`Your Score: ${score}/${total} (${percentage}%)\n\n${message}`);
+    });
+
+    showAnswersBtn.addEventListener('click', () => {
+      // Prompt for password
+      const password = prompt('🔐 Enter password to view answers:');
+      
+      if (password === 'ronaldpogi') {
+        // Remove any existing highlights
+        document.querySelectorAll('.option').forEach(opt => {
+          opt.classList.remove('correct-answer');
+        });
+        
+        // Highlight all correct answers
+        for (let i = 1; i <= 20; i++) {
+          const correctValue = correctAnswers[`q${i}`];
+          const correctOption = document.querySelector(`input[name="q${i}"][value="${correctValue}"]`);
+          if (correctOption) {
+            correctOption.closest('.option').classList.add('correct-answer');
+          }
+        }
+        
+        // Scroll to top of quiz
+        document.querySelector('.quiz-container').scrollTop = 0;
+        
+        alert('✅ Correct answers are now highlighted in green!');
+      } else if (password !== null) {
+        // Show laugh popup
+        laughPopup.classList.add('active');
+        setTimeout(() => {
+          laughPopup.classList.remove('active');
+          alert('❌ don\'t cheat ninja');
+        }, 3000);
+      }
+    });
+
+    // Close laugh popup on click
+    laughPopup.addEventListener('click', () => {
+      laughPopup.classList.remove('active');
+    });
+
+    // Navigation controls
+    // Removed - only fullscreen remains
+
+    // Fullscreen toggle
+    const fullscreenBtn = document.getElementById('fullscreenBtn');
+    if (fullscreenBtn) {
+      fullscreenBtn.addEventListener('click', function() {
+        console.log('Fullscreen button clicked');
+        if (!document.fullscreenElement) {
+          console.log('Entering fullscreen');
+          document.documentElement.requestFullscreen()
+            .then(() => console.log('Fullscreen activated'))
+            .catch(err => console.error('Fullscreen error:', err));
+        } else {
+          console.log('Exiting fullscreen');
+          document.exitFullscreen()
+            .then(() => console.log('Fullscreen exited'))
+            .catch(err => console.error('Exit fullscreen error:', err));
+        }
+      });
+    } else {
+      console.error('Fullscreen button not found');
+    }
+
+    // Keyboard navigation - F for fullscreen
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'f' || e.key === 'F') {
+        e.preventDefault();
+        document.getElementById('fullscreenBtn').click();
+      }
+    });
+
+    // Dropdown menu toggle
+    const menuBtn = document.getElementById('menuBtn');
+    const dropdownMenu = document.getElementById('dropdownMenu');
+    
+    menuBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      dropdownMenu.classList.toggle('show');
+    });
+
+    document.addEventListener('click', () => {
+      dropdownMenu.classList.remove('show');
+    });
+
+    // Smooth scroll on menu click
+    document.querySelectorAll('.dropdown-menu a').forEach(anchor => {
+      anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+        dropdownMenu.classList.remove('show');
+        const targetId = this.getAttribute('href');
+        const targetSection = document.querySelector(targetId);
+        targetSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
+    });
+
+    // Highlight toggle
+    const toggleBtn = document.getElementById("toggleHighlights");
+    let highlighted = false;
+    toggleBtn.addEventListener("click", () => {
+      document.querySelectorAll(".card ul").forEach(list => list.classList.toggle("highlight"));
+      highlighted = !highlighted;
+      toggleBtn.textContent = highlighted ? "🔆 Remove Highlights" : "💡 Highlight Key Points";
+    });
+
+    // Scroll animation observer for cards
+    const cards = document.querySelectorAll('.card');
+    const headers = document.querySelectorAll('.section-header');
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+        }
+      });
+    }, observerOptions);
+
+    cards.forEach(card => observer.observe(card));
+    headers.forEach(header => observer.observe(header));
+
+    // Add pulse animation
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.02); box-shadow: 0 25px 50px rgba(102,126,234,0.3); }
+      }
+    `;
+    document.head.appendChild(style);
+
+    // Initialize
+    // Removed slide counter
+  </script>
+</body>
+</html>
